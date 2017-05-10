@@ -433,6 +433,12 @@ static struct resource ath79_eth0_resources[] = {
 
 struct ag71xx_platform_data ath79_eth0_data = {
 	.reset_bit	= AR71XX_RESET_GE0_MAC,
+	.mac_addr[0] = 0xe4,
+	.mac_addr[1] = 0xf4,
+	.mac_addr[2] = 0xc6,
+	.mac_addr[3] = 0xf9,
+	.mac_addr[4] = 0xdb,
+	.mac_addr[5] = 0x73,
 };
 
 struct platform_device ath79_eth0_device = {
