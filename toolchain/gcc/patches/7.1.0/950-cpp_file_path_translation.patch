@@ -15,7 +15,7 @@ Forward ported from attachment to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=4
        break;
 --- a/gcc/c-family/c.opt
 +++ b/gcc/c-family/c.opt
-@@ -1829,6 +1829,10 @@ iquote
+@@ -1825,6 +1825,10 @@ iquote
  C ObjC C++ ObjC++ Joined Separate MissingArgError(missing path after %qs)
  -iquote <dir>	Add <dir> to the end of the quote include path.
  
@@ -53,18 +53,7 @@ Forward ported from attachment to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=4
  When preprocessing, handle directives, but do not expand macros.
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -504,8 +504,8 @@ Objective-C and Objective-C++ Dialects}.
- -idirafter @var{dir} @gol
- -imacros @var{file}  -imultilib @var{dir} @gol
- -iplugindir=@var{dir}  -iprefix @var{file} @gol
---iquote @var{dir}  -isysroot @var{dir}  -isystem @var{dir} @gol
---iwithprefix @var{dir}  -iwithprefixbefore @var{dir}  @gol
-+-iquote @var{dir}  -iremap@var{src}:@var{dst}  -isysroot @var{dir} @gol
-+-isystem @var{dir}  -iwithprefix @var{dir}  -iwithprefixbefore @var{dir}  @gol
- -L@var{dir}  -no-canonical-prefixes  --no-sysroot-suffix @gol
- -nostdinc  -nostdinc++  --sysroot=@var{dir}}
- 
-@@ -11866,6 +11866,12 @@ by @option{-fplugin=@var{name}} instead
+@@ -11861,6 +11861,12 @@ by @option{-fplugin=@var{name}} instead
  @option{-fplugin=@var{path}/@var{name}.so}.  This option is not meant
  to be used by the user, but only passed by the driver.
  

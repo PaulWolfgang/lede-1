@@ -1,15 +1,9 @@
 
-	This patch brings over a few features from MirBSD:
+	This patch brings over a feature from MirBSD:
 	* -fhonour-copts
 	  If this option is not given, it's warned (depending
 	  on environment variables). This is to catch errors
 	  of misbuilt packages which override CFLAGS themselves.
-	* -Werror-maybe-reset
-	  Has the effect of -Wno-error if GCC_NO_WERROR is
-	  set and not '0', a no-operation otherwise. This is
-	  to be able to use -Werror in "make" but prevent
-	  GNU autoconf generated configure scripts from
-	  freaking out.
 
 	This patch was authored by Thorsten Glaser <tg at mirbsd.de>
 	with copyright assignment to the FSF in effect.
@@ -89,18 +83,7 @@
  
 --- a/gcc/c-family/c.opt
 +++ b/gcc/c-family/c.opt
-@@ -508,6 +508,10 @@ Wfloat-conversion
- C ObjC C++ ObjC++ Var(warn_float_conversion) Warning LangEnabledBy(C ObjC C++ ObjC++,Wconversion)
- Warn for implicit type conversions that cause loss of floating point precision.
- 
-+Werror-maybe-reset
-+C ObjC C++ ObjC++
-+; Documented in common.opt
-+
- Wfloat-equal
- C ObjC C++ ObjC++ Var(warn_float_equal) Warning
- Warn if testing floating point numbers for equality.
-@@ -1412,6 +1416,9 @@ C++ ObjC++ Optimization Alias(fexception
+@@ -1412,6 +1412,9 @@ C++ ObjC++ Optimization Alias(fexception
  fhonor-std
  C++ ObjC++ Ignore Warn(switch %qs is no longer supported)
  
@@ -112,18 +95,7 @@
  Assume normal C execution environment.
 --- a/gcc/common.opt
 +++ b/gcc/common.opt
-@@ -577,6 +577,10 @@ Werror=
- Common Joined
- Treat specified warning as error.
- 
-+Werror-maybe-reset
-+Common
-+If environment variable GCC_NO_WERROR is set, act as -Wno-error
-+
- Wextra
- Common Var(extra_warnings) Warning
- Print extra (possibly unwanted) warnings.
-@@ -1510,6 +1514,9 @@ fguess-branch-probability
+@@ -1510,6 +1510,9 @@ fguess-branch-probability
  Common Report Var(flag_guess_branch_prob) Optimization
  Enable guessing of branch probabilities.
  
@@ -135,18 +107,10 @@
  ; On SVR4 targets, it also controls whether or not to emit a
 --- a/gcc/opts.c
 +++ b/gcc/opts.c
-@@ -1921,6 +1921,17 @@ common_handle_option (struct gcc_options
+@@ -1921,6 +1921,9 @@ common_handle_option (struct gcc_options
  			       opts, opts_set, loc, dc);
        break;
  
-+    case OPT_Werror_maybe_reset:
-+      {
-+        char *ev = getenv ("GCC_NO_WERROR");
-+        if ((ev != NULL) && (*ev != '0'))
-+          warnings_are_errors = 0;
-+      }
-+      break;
-+
 +    case OPT_fhonour_copts:
 +      break;
 +
@@ -155,24 +119,10 @@
        opts->x_warn_larger_than = value != -1;
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -274,7 +274,7 @@ Objective-C and Objective-C++ Dialects}.
- -Wno-discarded-qualifiers  -Wno-discarded-array-qualifiers @gol
- -Wno-div-by-zero  -Wdouble-promotion  -Wduplicated-cond @gol
- -Wempty-body  -Wenum-compare  -Wno-endif-labels  -Wexpansion-to-defined @gol
---Werror  -Werror=*  -Wfatal-errors  -Wfloat-equal  -Wformat  -Wformat=2 @gol
-+-Werror  -Werror=*  -Werror-maybe-reset  -Wfatal-errors  -Wfloat-equal  -Wformat  -Wformat=2 @gol
- -Wno-format-contains-nul  -Wno-format-extra-args  @gol
- -Wformat-nonliteral -Wformat-overflow=@var{n} @gol
- -Wformat-security  -Wformat-signedness  -Wformat-truncation=@var{n} @gol
-@@ -6565,6 +6565,22 @@ This option is only supported for C and
+@@ -6565,6 +6565,17 @@ This option is only supported for C and
  @option{-Wall} and by @option{-Wpedantic}, which can be disabled with
  @option{-Wno-pointer-sign}.
  
-+@item -Werror-maybe-reset
-+@opindex Werror-maybe-reset
-+Act like @samp{-Wno-error} if the @env{GCC_NO_WERROR} environment
-+variable is set to anything other than 0 or empty.
-+
 +@item -fhonour-copts
 +@opindex fhonour-copts
 +If @env{GCC_HONOUR_COPTS} is set to 1, abort if this option is not
@@ -187,23 +137,4 @@
  @item -Wstack-protector
  @opindex Wstack-protector
  @opindex Wno-stack-protector
-@@ -7446,7 +7462,7 @@ so, the first branch is redirected to ei
- second branch or a point immediately following it, depending on whether
- the condition is known to be true or false.
- 
--Enabled at levels @option{-O2}, @option{-O3}, @option{-Os}.
-+Enabled at levels @option{-O3}.
- 
- @item -fsplit-wide-types
- @opindex fsplit-wide-types
---- a/gcc/doc/cppwarnopts.texi
-+++ b/gcc/doc/cppwarnopts.texi
-@@ -80,3 +80,8 @@ This sometimes happens in older programs
- @noindent
- The second and third @code{FOO} should be in comments.
- This warning is on by default.
-+
-+@item -Werror-maybe-reset
-+@opindex Werror-maybe-reset
-+Act like @samp{-Wno-error} if the @env{GCC_NO_WERROR} environment
-+variable is set to anything other than 0 or empty.
+

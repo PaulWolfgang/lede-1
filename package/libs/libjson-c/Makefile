@@ -27,7 +27,7 @@ PKG_MAINTAINER:=Felix Fietkau <nbd@nbd.name>
 
 include $(INCLUDE_DIR)/package.mk
 
-TARGET_CFLAGS += $(FPIC)
+TARGET_CFLAGS += $(FPIC) -Wno-implicit-fallthrough
 
 define Package/libjson-c
   SECTION:=libs
@@ -39,8 +39,6 @@ endef
 define Package/libjson-c/description
  This package contains a library for javascript object notation backends.
 endef
-
-TARGET_CFLAGS += -Wimplicit-fallthrough=0
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include

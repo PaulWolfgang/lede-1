@@ -70,12 +70,13 @@ endif
 HOST_STAMP_PREPARED:=$(HOST_BUILD_DIR)/.prepared
 HOST_STAMP_BUILT:=$(GCC_BUILD_DIR)/.built
 HOST_STAMP_CONFIGURED:=$(GCC_BUILD_DIR)/.configured
-HOST_STAMP_INSTALLED:=$(STAGING_DIR_HOST)/stamp/.gcc_$(GCC_VARIANT)_installed
+HOST_STAMP_INSTALLED:=$(HOST_BUILD_PREFIX)/stamp/.gcc_$(GCC_VARIANT)_installed
 
 SEP:=,
 TARGET_LANGUAGES:="c,c++$(if $(CONFIG_INSTALL_LIBGCJ),$(SEP)java)$(if $(CONFIG_INSTALL_GFORTRAN),$(SEP)fortran)$(if $(CONFIG_INSTALL_GCCGO),$(SEP)go)"
 
-TAR_OPTIONS += --exclude='gcc/testsuite/*' --exclude=gcc/ada/*.ad*
+TAR_OPTIONS += \
+	--exclude-from='$(CURDIR)/../exclude-testsuite' --exclude=gcc/ada/*.ad* \
 
 ifndef CONFIG_INSTALL_LIBGCJ
   TAR_OPTIONS += --exclude=libjava
@@ -90,9 +91,9 @@ ifdef CONFIG_INSTALL_GCCGO
 endif
 
 ifdef CONFIG_GCC_USE_GRAPHITE
-  GRAPHITE_CONFIGURE=--with-isl=$(REAL_STAGING_DIR_HOST)
+  GRAPHITE_CONFIGURE:= --with-isl=$(TOPDIR)/staging_dir/host
 else
-  GRAPHITE_CONFIGURE=--without-isl --without-cloog
+  GRAPHITE_CONFIGURE:= --without-isl --without-cloog
 endif
 
 GCC_CONFIGURE:= \
@@ -217,8 +218,8 @@ endef
 
 define Host/Clean
 	rm -rf $(if $(GCC_PREPARE),$(HOST_SOURCE_DIR)) \
-		$(STAGING_DIR_HOST)/stamp/.gcc_* \
-		$(STAGING_DIR_HOST)/stamp/.binutils_* \
+		$(HOST_BUILD_PREFIX)/stamp/.gcc_* \
+		$(HOST_BUILD_PREFIX)/stamp/.binutils_* \
 		$(GCC_BUILD_DIR) \
 		$(BUILD_DIR_TOOLCHAIN)/$(PKG_NAME) \
 		$(TOOLCHAIN_DIR)/$(REAL_GNU_TARGET_NAME) \
